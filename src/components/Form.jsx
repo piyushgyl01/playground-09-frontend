@@ -10,7 +10,7 @@ export default function Form({
     return (
       <form onSubmit={handleSubmit}>
         {error && <p className="error">Error: {error}</p>}
-        {isLoading && <p>Loading...</p>}
+        {!formData.hasOwnProperty('marks') && isLoading && <p>Loading...</p>}
         
         <input
           type="text"
