@@ -1,17 +1,12 @@
+
+
 {
-  "version": 2,
-  "builds": [
-    {
-      "src": "package.json",
-      "use": "@vercel/static-build",
-      "config": { "distDir": "dist" }
-    }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "/index.html",
-      "headers": { "cache-control": "no-cache, no-store" }
-    }
-  ]
-}
+    "version": 2,
+    "routes": [
+      {
+        "src": "/(.*)",
+        "dest": "/public/index.html",
+        "headers": { "cache-control": "no-cache, no-store" }
+      }
+    ]
+  }
