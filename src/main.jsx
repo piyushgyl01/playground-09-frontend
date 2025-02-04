@@ -21,6 +21,7 @@ import StudentDetail from "./pages/StudentDetail.jsx";
 const router = createBrowserRouter([
   {
     element: <Navbar />,
+    path: "/",
     children: [
       {
         index: true,
