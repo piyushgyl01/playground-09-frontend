@@ -5,6 +5,7 @@ import {
   setSortBy,
   fetchStudents,
 } from "../features/students/studentsSlice";
+import Select from "../components/Select";
 
 import { useEffect } from "react";
 export default function Classes() {
@@ -22,26 +23,41 @@ export default function Classes() {
     dispatch(setSortBy(e.target.value));
   };
 
+  const filterOptions = [
+    { value: "All", label: "All" },
+    { value: "Male", label: "Male" },
+    { value: "Female", label: "Female" }
+  ];
+ 
+  const sortOptions = [
+    { value: "Name", label: "Name" },
+    { value: "Marks", label: "Marks" },
+    { value: "Attendance", label: "Attendance" }
+  ];
+ 
+
   const students = useSelector(selectFilteredAndSortedStudents);
 
   return (
     <>
       <main className="container">
         <h1>Class View</h1>
-        <label htmlFor="genderFilterSelect">Filter by Gender: </label>
-        <select id="genderFilterSelect" onChange={handleFilterChange}>
-          <option value="All">All</option>
-          <option value="Male">Male</option>
-          <option value="Female">Female</option>
-        </select>
+        <Select
+          label="Filter by Gender: "
+          id="genderFilterSelect"
+          options={filterOptions}
+          onChange={handleFilterChange}
+          defaultValue="All"
+        />
         <br />
         <br />
-        <label htmlFor="sortBySelect">Sort by: </label>
-        <select id="sortBySelect" onChange={handleSortChange}>
-          <option value="Name">Name</option>
-          <option value="Marks">Marks</option>
-          <option value="Attendance">Attendance</option>
-        </select>
+        <Select
+          label="Sort by: "
+          id="sortBySelect"
+          options={sortOptions}
+          onChange={handleSortChange}
+          defaultValue="Name"
+        />
         <ul>
           {students.map((student) => (
             <li key={student._id}>

@@ -1,6 +1,13 @@
-import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import {
+  createSlice,
+  createAsyncThunk,
+  createSelector,
+} from "@reduxjs/toolkit";
 import axios from "axios";
 
+// API Calls using Redux Thunks
+
+// GET all students
 export const fetchStudents = createAsyncThunk(
   "students/fetchStudents",
   async () => {
@@ -11,6 +18,7 @@ export const fetchStudents = createAsyncThunk(
   }
 );
 
+//POST new student
 export const addStudentAsync = createAsyncThunk(
   "students/addStudent",
   async (formData) => {
@@ -22,6 +30,7 @@ export const addStudentAsync = createAsyncThunk(
   }
 );
 
+// DELETE student
 export const deleteStudentAsync = createAsyncThunk(
   "students/deleteStudent",
   async (id) => {
@@ -39,6 +48,7 @@ export const deleteStudentAsync = createAsyncThunk(
   }
 );
 
+// PUT updated student
 export const updateStudentAsync = createAsyncThunk(
   "students/updateStudent",
   async ({ id, formData }) => {
@@ -55,31 +65,34 @@ export const updateStudentAsync = createAsyncThunk(
   }
 );
 
-export const selectFilteredAndSortedStudents = state => {
-  let students = [...state.students.students];
-  
-  // Filter
-  if (state.students.filter !== "All") {
-    students = students.filter(student => student.gender === state.students.filter);
-  }
- 
-  // Sort
-  switch (state.students.sortBy) {
-    case "Name":
-      students.sort((a, b) => a.name.localeCompare(b.name));
-      break;
-    case "Marks":
-      students.sort((a, b) => b.marks - a.marks);
-      break;
-    case "Attendance":
-      students.sort((a, b) => b.attendance - a.attendance);
-      break;
-  }
- 
-  return students;
- };
- 
+// Memoized Selector for Filtering & Sorting
+export const selectFilteredAndSortedStudents = createSelector(
+  (state) => state.students.students, // Get students array
+  (state) => state.students.filter, // Get filter value
+  (state) => state.students.sortBy, // Get sort value
+  (students, filter, sortBy) => {
+    let filtered = students;
 
+    // Filter logic
+    if (filter !== "All") {
+      filtered = filtered.filter((student) => student.gender === filter);
+    }
+
+    // Sort logic
+    switch (sortBy) {
+      case "Name":
+        return [...filtered].sort((a, b) => a.name.localeCompare(b.name));
+      case "Marks":
+        return [...filtered].sort((a, b) => b.marks - a.marks);
+      case "Attendance":
+        return [...filtered].sort((a, b) => b.attendance - a.attendance);
+      default:
+        return filtered;
+    }
+  }
+);
+
+// Redux Slice Configuration
 export const studentsSlice = createSlice({
   name: "students",
   initialState: {
@@ -91,6 +104,7 @@ export const studentsSlice = createSlice({
     filter: "All",
     sortBy: "Name",
   },
+  // Synchronous actions
   reducers: {
     addStudent: (state, action) => {
       state.students.push(action.payload);
@@ -111,9 +125,10 @@ export const studentsSlice = createSlice({
       state.sortBy = action.payload;
     },
   },
+  // Async action handlers
   extraReducers: (builder) => {
+    // Fetch status handlers
     builder
-      // Fetch cases
       .addCase(fetchStudents.pending, (state) => {
         state.status = "loading";
       })
@@ -125,7 +140,7 @@ export const studentsSlice = createSlice({
         state.status = "error";
         state.error = action.error.message;
       })
-      // Add cases
+      // Add status handlers
       .addCase(addStudentAsync.pending, (state) => {
         state.addStatus = "loading";
       })
@@ -136,7 +151,7 @@ export const studentsSlice = createSlice({
         state.addStatus = "error";
         state.error = action.error.message;
       })
-      // Delete cases
+      // Delete status handlers
       .addCase(deleteStudentAsync.pending, (state) => {
         state.status = "loading";
       })
@@ -150,7 +165,7 @@ export const studentsSlice = createSlice({
         state.status = "error";
         state.error = action.error.message;
       })
-      // Update cases
+      // Update status handlers
       .addCase(updateStudentAsync.pending, (state) => {
         state.updateStatus = "loading";
       })
@@ -164,6 +179,7 @@ export const studentsSlice = createSlice({
   },
 });
 
-export const { addStudent, updateStudent, setFilter, setSortBy } = studentsSlice.actions;
+export const { addStudent, updateStudent, setFilter, setSortBy } =
+  studentsSlice.actions;
 
 export default studentsSlice.reducer;

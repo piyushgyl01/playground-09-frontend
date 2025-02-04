@@ -8,6 +8,7 @@ import {
   updateStudentAsync,
 } from "../features/students/studentsSlice.js";
 import { useNavigate } from "react-router";
+import Form from "../components/Form.jsx";
 
 export default function EditStudent() {
   const navigate = useNavigate();
@@ -39,7 +40,7 @@ export default function EditStudent() {
     try {
       const resultAction = await dispatch(
         updateStudentAsync({ id: studentID, formData }) // Pass studentID here
-    );
+      );
       if (updateStudentAsync.fulfilled.match(resultAction)) {
         const updated = resultAction.payload;
         dispatch(updateStudent(updated));
@@ -50,7 +51,8 @@ export default function EditStudent() {
     } catch (error) {
       setSubmitError(error.message || "Failed to add student");
     }
-  };useEffect(() => {
+  };
+  useEffect(() => {
     if (foundStudent) {
       setFormData({
         name: foundStudent.name,
@@ -61,7 +63,7 @@ export default function EditStudent() {
         marks: foundStudent.marks,
       });
     }
-  }, [foundStudent]); 
+  }, [foundStudent]);
 
   useEffect(() => {
     if (updateStatus === "error") {
@@ -72,84 +74,14 @@ export default function EditStudent() {
   return (
     <>
       <main className="container">
-        {" "}
-        {updateStatus === "loading" && <p>Updating student...</p>}
-        {submitError && <p className="error">Error: {submitError}</p>}
-        <h4>Edit Student Details of {foundStudent?.name}</h4>{" "}
-        <form onSubmit={handleSubmit}>
-          <input
-            type="text"
-            placeholder="Name"
-            value={formData.name}
-            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-          />
-          <br /> <br /> <label htmlFor="">Age: </label>
-          <input
-            type="number"
-            placeholder="Age"
-            value={formData.age}
-            onChange={(e) =>
-              setFormData({ ...formData, age: parseFloat(e.target.value) })
-            }
-          />
-          <br /> <br />
-          <input
-            type="text"
-            placeholder="Grade"
-            value={formData.grade}
-            onChange={(e) =>
-              setFormData({ ...formData, grade: e.target.value })
-            }
-          />
-          <br /> <br />
-          <label htmlFor="gender">Gender: </label>
-          <input
-            type="radio"
-            name="gender"
-            value="Male"
-            checked={formData.gender === "Male"}
-            onChange={(e) =>
-              setFormData({ ...formData, gender: e.target.value })
-            }
-          />
-          Male
-          <input
-            type="radio"
-            name="gender"
-            value="Female"
-            checked={formData.gender === "Female"}
-            onChange={(e) =>
-              setFormData({ ...formData, gender: e.target.value })
-            }
-          />
-          Female
-          <br /> <br /> <label htmlFor="">Attendance: </label>
-          <input
-            type="number"
-            placeholder="Attendance"
-            value={formData.attendance}
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                attendance: parseFloat(e.target.value),
-              })
-            }
-          />
-          <br /> <br /> <label htmlFor="">Marks: </label>
-          <input
-            type="number"
-            placeholder="Marks"
-            value={formData.marks}
-            onChange={(e) =>
-              setFormData({ ...formData, marks: parseFloat(e.target.value) })
-            }
-          />
-          <br /> <br />
-          {/* disabled={addStatus === "loading"} */}
-          <button type="submit" disabled={updateStatus === "loading"}>
-            {updateStatus === "loading" ? "Updating..." : "Save"} 
-          </button>
-        </form>
+        <Form
+          formData={formData}
+          setFormData={setFormData}
+          handleSubmit={handleSubmit}
+          submitButtonText={updateStatus === "loading" ? "Updating..." : "Save"}
+          isLoading={updateStatus === "loading"}
+          error={submitError}
+        />
       </main>
     </>
   );
